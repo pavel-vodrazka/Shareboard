@@ -7,6 +7,7 @@
 # Created:  2013-01-16
 #
 import argparse
+import sys
 import socket
 import requests
 from shareboard.parser import ShellParser
@@ -52,6 +53,10 @@ def start(args):
 
 
 def set(args):
+    if args.text == '-':
+	    args.text = ''
+	    for line in sys.stdin:
+		    args.text = args.text + line
     url = 'http://%s:%s/' % (args.host, args.port)
     kwargs = {
             'data': {'text': args.text},
@@ -93,8 +98,8 @@ def main():
     # create the subparser for the 'set' command
     parser_set = subparsers.add_parser('set',
                                        help='Post new data to the shareboard')
-    parser_set.add_argument('text', type=unicode,
-                            help='Text data to be seted to the shareboard')
+    parser_set.add_argument('text', default='-', type=unicode,
+                            help='Text data to be set to the shareboard. If specified as "-", text data is taken from stdin.')
     parser_set.add_argument('-t', '--timeout', default=DEFAULT_TIMEOUT, type=float,
                             help='Seconds to timeout the connection')
     parser_set.set_defaults(func=set)
